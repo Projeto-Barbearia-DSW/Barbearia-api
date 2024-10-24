@@ -3,11 +3,11 @@ import con from "./connection.js"
 
 export async function login(credenciais) {
     const comando = `
-        select id_adm    as id,
-               email_adm     as email
+        select id_admin    as id,
+               email     as email
         from admin
-        where email_adm = ? 
-          and senha_adm = ?
+        where email = ? 
+          and senha = ?
     `
 
     const [registros] = await con.query(comando, [credenciais.email, credenciais.senha])
