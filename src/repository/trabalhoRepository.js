@@ -90,3 +90,28 @@ export async function inserirServico(servico) {
     return info.insertId;
 }
 
+export async function listarServicosFeitos() {
+    const comando = `
+        select imagem as imagem_servico_feito,
+               nome as nome_servico_feito
+        from servicos_feitos;
+    `
+
+    let [registros] = await con.query(comando);
+    return registros;
+}
+
+export async function inserirServicoFeito(servicoFeito) {
+    const comando = `
+        INSERT INTO servicos_feitos (imagem, nome)
+        VALUES (?, ?)
+    `;
+
+    let [info] = await con.query(comando, [
+        servicoFeito.imagemServicoFeito,
+        servicoFeito.nomeServicoFeito
+    ]);
+
+    return info.insertId;
+}
+

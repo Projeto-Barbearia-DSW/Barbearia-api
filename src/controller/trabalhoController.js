@@ -2,15 +2,19 @@ import listarAdm from "../service/trabalho/listarAdm.js";
 import listarServico from "../service/trabalho/listarServico.js";
 import agendamento from "../service/trabalho/agendamento.js";
 import listarHoras from "../service/trabalho/listarHora.js";
-import { Router } from "express";
 import listarAgendamentos from "../service/trabalho/listarAgendamentos.js";
-import { inserirServico } from "../repository/trabalhoRepository.js";
+import servicos from "../service/trabalho/servicos.js";
+import listarServicoFeito from "../service/trabalho/listarServicoFeito.js";
+import servicosFeitos from "../service/trabalho/servicosFeitos.js";
+import { Router } from "express";
 import multer from 'multer';
 import path from 'path';
+import {inserirServicoFeito} from "../repository/trabalhoRepository.js";
+
 
 const endpoints = Router();
 
-let storage = multer.diskStorage({
+let storageServicos = multer.diskStorage({
     destination: './storage/servicos',
     filename: (req, file, cb) => {
         const extension = path.extname(file.originalname);
@@ -19,7 +23,18 @@ let storage = multer.diskStorage({
     }
 });
 
-let uploadServico = multer({ storage: storage });
+let uploadServico = multer({ storage: storageServicos });
+
+let storageServicosFeitos = multer.diskStorage({
+    destination: './storage/servicosFeitos',
+    filename: (req, file, cb) => {
+        const extension = path.extname(file.originalname);
+        const fileName = `${Date.now()}${extension}`;
+        cb(null, fileName);
+    }
+});
+
+let uploadServicoFeitos = multer({ storage: storageServicosFeitos });
 
 endpoints.get('/admin', async (req, resp) => {
     try {
@@ -45,6 +60,54 @@ endpoints.get('/servico', async (req, resp) => {
     }
 });
 
+endpoints.post('/servico', uploadServico.single('imagem'), async (req, resp) => {
+    try {
+        let servico = req.body;
+        servico.imagemServico = req.file.path;
+
+        let id = await servicos(servico);
+
+        resp.send({
+            novoId: id
+        });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+endpoints.get('/servicosfeitos', async (req, resp) => {
+    try {
+        let registros = await listarServicoFeito();
+        resp.send(registros);
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+endpoints.post('/servicosfeitos', uploadServicoFeitos.single('imagem') ,async (req, resp) => {
+    try {
+        let servicoFeito = req.body;
+        servicoFeito.imagemServicoFeito = req.file.path;
+
+        let id = await inserirServicoFeito(servicoFeito);
+
+        resp.send({
+            novoId: id
+        });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
 endpoints.post('/agendamento', async (req, resp) => {
     try {
         let agendar = req.body;
@@ -62,7 +125,7 @@ endpoints.post('/agendamento', async (req, resp) => {
     }
 });
 
-endpoints.get('/agendamentos', async (req, resp) => {
+endpoints.get('/agendamento', async (req, resp) => {
     try {
         let registros = await listarAgendamentos();
         resp.send(registros);
@@ -78,24 +141,6 @@ endpoints.get('/horas', async (req, resp) => {
     try {
         let registros = await listarHoras();
         resp.send(registros);
-    }
-    catch (err) {
-        resp.status(400).send({
-            erro: err.message
-        });
-    }
-});
-
-endpoints.post('/servicos', uploadServico.single('imagem'), async (req, resp) => {
-    try {
-        let servico = req.body;
-        servico.imagemServico = req.file.path;
-
-        let id = await inserirServico(servico);
-
-        resp.send({
-            novoId: id
-        });
     }
     catch (err) {
         resp.status(400).send({
