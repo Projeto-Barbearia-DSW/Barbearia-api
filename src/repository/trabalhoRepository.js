@@ -73,3 +73,20 @@ export async function listarHorarios() {
     let [registros] = await con.query(comando);
     return registros;
 }
+
+export async function inserirServico(servico) {
+    const comando = `
+        INSERT INTO servicos (imagem, nome, valor, tempo)
+        VALUES (?, ?, ?, ?)
+    `;
+
+    let [info] = await con.query(comando, [
+        servico.imagemServico,
+        servico.nomeServico,
+        servico.valorServico,
+        servico.tempoServico
+    ]);
+
+    return info.insertId;
+}
+
