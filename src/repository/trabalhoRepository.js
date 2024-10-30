@@ -1,5 +1,65 @@
 import con from "./connection.js"
 
+/*
+Inserir
+ */
+
+export async function inserirAgendamento(agendar) {
+    const comando = `
+        INSERT INTO agendamento (nome_cliente, telefone_cliente, data_agendamento, id_horario, id_servico)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    let [info] = await con.query(comando, [
+        agendar.nomeCliente,
+        agendar.telefoneCliente,
+        agendar.dataAgendamento,
+        agendar.idHorario,
+        agendar.idServico
+    ]);
+
+    return info.insertId;
+}
+
+export async function inserirServico(servico) {
+    const comando = `
+        INSERT INTO servicos (imagem, nome, valor, tempo)
+        VALUES (?, ?, ?, ?)
+    `;
+
+    let [info] = await con.query(comando, [
+        servico.imagemServico,
+        servico.nomeServico,
+        servico.valorServico,
+        servico.tempoServico
+    ]);
+
+    return info.insertId;
+}
+
+export async function inserirServicoFeito(servicoFeito) {
+    const comando = `
+        INSERT INTO servicos_feitos (imagem, nome)
+        VALUES (?, ?)
+    `;
+
+    let [info] = await con.query(comando, [
+        servicoFeito.imagemServicoFeito,
+        servicoFeito.nomeServicoFeito
+    ]);
+
+    return info.insertId;
+}
+
+
+
+
+
+
+/*
+Listar
+ */
+
 export async function listarAdmin() {
     const comando = `
         select id_admin as id_admin,
@@ -29,8 +89,6 @@ export async function listarAgendamento() {
     return registros;
 }
 
-
-
 export async function listarServicos() {
     const comando = `
         select id_servico as id_servico,
@@ -46,22 +104,20 @@ export async function listarServicos() {
     return registros;
 }
 
-export async function inserirAgendamento(agendar) {
+
+export async function listarServicosFeitos() {
     const comando = `
-        INSERT INTO agendamento (nome_cliente, telefone_cliente, data_agendamento, id_horario, id_servico)
-        VALUES (?, ?, ?, ?, ?)
-    `;
+        select id_servico_feito as id_servico_feito,
+                imagem as imagem_servico_feito,
+                nome as nome_servico_feito
+        from servicos_feitos;
+    `
 
-    let [info] = await con.query(comando, [
-        agendar.nomeCliente,
-        agendar.telefoneCliente,
-        agendar.dataAgendamento,
-        agendar.idHorario,
-        agendar.idServico
-    ]);
-
-    return info.insertId;
+    let [registros] = await con.query(comando);
+    return registros;
 }
+
+
 
 export async function listarHorarios() {
     const comando = `
@@ -74,44 +130,32 @@ export async function listarHorarios() {
     return registros;
 }
 
-export async function inserirServico(servico) {
-    const comando = `
-        INSERT INTO servicos (imagem, nome, valor, tempo)
-        VALUES (?, ?, ?, ?)
-    `;
 
-    let [info] = await con.query(comando, [
-        servico.imagemServico,
-        servico.nomeServico,
-        servico.valorServico,
-        servico.tempoServico
-    ]);
 
-    return info.insertId;
+
+
+/*
+Deletar
+ */
+export async function deletarAgendamento(id_agendamento) {
+    const comando = `delete from agendamento where id_agendamento = ?;`;
+
+    let [info] = await con.query(comando, [id_agendamento])
+    return info.affectedRows;
 }
 
-export async function listarServicosFeitos() {
-    const comando = `
-        select imagem as imagem_servico_feito,
-               nome as nome_servico_feito
-        from servicos_feitos;
-    `
 
-    let [registros] = await con.query(comando);
-    return registros;
+export async function deletarServicoFeito(id_servico_feito) {
+    const comando = `delete from servicos_feitos where id_servico_feito = ?;`;
+
+    let [info] = await con.query(comando, [id_servico_feito])
+    return info.affectedRows;
 }
 
-export async function inserirServicoFeito(servicoFeito) {
-    const comando = `
-        INSERT INTO servicos_feitos (imagem, nome)
-        VALUES (?, ?)
-    `;
+export async function deletarServico(id_servico) {
+    const comando = `delete from servicos where id_servico = ?;`;
 
-    let [info] = await con.query(comando, [
-        servicoFeito.imagemServicoFeito,
-        servicoFeito.nomeServicoFeito
-    ]);
-
-    return info.insertId;
+    let [info] = await con.query(comando, [id_servico])
+    return info.affectedRows;
 }
 

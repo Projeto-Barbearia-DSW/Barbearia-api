@@ -5,11 +5,15 @@ import listarHoras from "../service/trabalho/listarHora.js";
 import listarAgendamentos from "../service/trabalho/listarAgendamentos.js";
 import servicos from "../service/trabalho/servicos.js";
 import listarServicoFeito from "../service/trabalho/listarServicoFeito.js";
+import excluirAgendamentos from "../service/trabalho/deletarAgendamento.js";
+import excluirServicoFeito from "../service/trabalho/deletarServicoFeito.js";
+import excluirServico from "../service/trabalho/deletarServico.js";
 import servicosFeitos from "../service/trabalho/servicosFeitos.js";
 import { Router } from "express";
 import multer from 'multer';
 import path from 'path';
 import {inserirServicoFeito} from "../repository/trabalhoRepository.js";
+
 
 
 const endpoints = Router();
@@ -36,6 +40,11 @@ let storageServicosFeitos = multer.diskStorage({
 
 let uploadServicoFeitos = multer({ storage: storageServicosFeitos });
 
+
+/*
+Admin
+ */
+
 endpoints.get('/admin', async (req, resp) => {
     try {
         let registros = await listarAdm();
@@ -47,6 +56,13 @@ endpoints.get('/admin', async (req, resp) => {
         });
     }
 });
+
+
+
+
+/*
+Servico
+ */
 
 endpoints.get('/servico', async (req, resp) => {
     try {
@@ -78,6 +94,30 @@ endpoints.post('/servico', uploadServico.single('imagem'), async (req, resp) => 
     }
 });
 
+endpoints.delete('/servico/:id', async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let linhasAfetadas = await excluirServico(id);
+        resp.send({ linhasAfetadas });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+
+
+
+/*
+Servico Feito
+ */
+
 endpoints.get('/servicosfeitos', async (req, resp) => {
     try {
         let registros = await listarServicoFeito();
@@ -108,6 +148,30 @@ endpoints.post('/servicosfeitos', uploadServicoFeitos.single('imagem') ,async (r
     }
 });
 
+endpoints.delete('/servicosfeitos/:id', async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let linhasAfetadas = await excluirServicoFeito(id);
+        resp.send({ linhasAfetadas });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+
+
+
+/*
+Agendamento
+ */
+
 endpoints.post('/agendamento', async (req, resp) => {
     try {
         let agendar = req.body;
@@ -137,6 +201,29 @@ endpoints.get('/agendamento', async (req, resp) => {
     }
 });
 
+endpoints.delete('/agendamento/:id', async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let linhasAfetadas = await excluirAgendamentos(id);
+        resp.send({ linhasAfetadas });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+
+
+
+
+
+
 endpoints.get('/horas', async (req, resp) => {
     try {
         let registros = await listarHoras();
@@ -148,5 +235,13 @@ endpoints.get('/horas', async (req, resp) => {
         });
     }
 });
+
+
+
+
+
+
+
+
 
 export default endpoints;
