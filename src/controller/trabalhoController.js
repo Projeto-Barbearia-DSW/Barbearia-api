@@ -9,7 +9,7 @@ import excluirAgendamentos from "../service/trabalho/deletarAgendamento.js";
 import excluirServicoFeito from "../service/trabalho/deletarServicoFeito.js";
 import excluirServico from "../service/trabalho/deletarServico.js";
 
-import {atualizarServicoFeito, atualizarServico} from "../repository/trabalhoRepository.js";
+import {atualizarServicoFeito, atualizarServico, atualizarAgendamento} from "../repository/trabalhoRepository.js";
 import servicosFeitos from "../service/trabalho/servicosFeitos.js";
 import { Router } from "express";
 import multer from 'multer';
@@ -273,6 +273,27 @@ endpoints.put('/servicosfeitos/:id', uploadServicoFeitos.single('imagem'), async
         servicoFeito.imagemServicoFeito = req.file.path;
 
         let linhasAfetadas = await atualizarServicoFeito(id, servicoFeito);
+
+        resp.send({ linhasAfetadas });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+
+endpoints.put('/agendamento/:id', async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let agendamento = req.body;
+
+        let linhasAfetadas = await atualizarAgendamento(id, agendamento);
 
         resp.send({ linhasAfetadas });
     }

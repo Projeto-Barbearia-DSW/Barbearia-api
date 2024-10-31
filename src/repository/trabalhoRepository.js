@@ -201,3 +201,24 @@ export async function atualizarServicoFeito(id, servicoFeito) {
 }
 
 
+
+export async function atualizarAgendamento(id, agendamento) {
+    const comando = `
+        UPDATE agendamento
+        SET nome_cliente = ?, telefone_cliente = ?, data_agendamento = ?, id_horario = ?, id_servico = ?
+        WHERE id_agendamento = ?
+    `;
+
+    let [info] = await con.query(comando, [
+        agendamento.nomeCliente,
+        agendamento.telefoneCliente,
+        agendamento.dataAgendamento,
+        agendamento.idHorario,
+        agendamento.idServico,
+        id
+    ]);
+
+    return info.affectedRows;
+}
+
+
