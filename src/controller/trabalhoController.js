@@ -9,7 +9,12 @@ import excluirAgendamentos from "../service/trabalho/deletarAgendamento.js";
 import excluirServicoFeito from "../service/trabalho/deletarServicoFeito.js";
 import excluirServico from "../service/trabalho/deletarServico.js";
 
-import {atualizarServicoFeito, atualizarServico, atualizarAgendamento} from "../repository/trabalhoRepository.js";
+import {
+    atualizarServicoFeito,
+    atualizarServico,
+    atualizarAgendamento,
+    atualizarServicoFeitoNome, atualizarServicoNome
+} from "../repository/trabalhoRepository.js";
 import servicosFeitos from "../service/trabalho/servicosFeitos.js";
 import { Router } from "express";
 import multer from 'multer';
@@ -249,9 +254,17 @@ endpoints.put('/servico/:id', uploadServico.single('imagem'), async (req, resp) 
         }
 
         let servico = req.body;
-        servico.imagemServico = req.file.path;
+        servico.imagemServico = req.file?.path ?? null;
 
-        let linhasAfetadas = await atualizarServico(id, servico);
+
+        let linhasAfetadas = null;
+        if (servico.imagemServico == null) {
+            linhasAfetadas = await atualizarServicoNome(id, servico);
+        }
+        else {
+            linhasAfetadas = await atualizarServico(id, servico);
+        }
+
 
         resp.send({ linhasAfetadas });
     }
@@ -270,9 +283,16 @@ endpoints.put('/servicosfeitos/:id', uploadServicoFeitos.single('imagem'), async
         }
 
         let servicoFeito = req.body;
-        servicoFeito.imagemServicoFeito = req.file.path;
+        servicoFeito.imagemServicoFeito = req.file?.path ?? null;
 
-        let linhasAfetadas = await atualizarServicoFeito(id, servicoFeito);
+        let linhasAfetadas = null;
+        if (servicoFeito.imagemServicoFeito == null) {
+            linhasAfetadas = await atualizarServicoFeitoNome(id, servicoFeito);
+        }
+        else {
+            linhasAfetadas = await atualizarServicoFeito(id, servicoFeito);
+        }
+
 
         resp.send({ linhasAfetadas });
     }

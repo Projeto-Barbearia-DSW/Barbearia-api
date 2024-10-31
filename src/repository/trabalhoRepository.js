@@ -184,6 +184,23 @@ export async function atualizarServico(id, servico) {
     return info.affectedRows;
 }
 
+export async function atualizarServicoNome(id, servico) {
+    const comando = `
+        UPDATE servicos
+        SET nome = ?, valor = ?, tempo = ?
+        WHERE id_servico = ?
+    `;
+
+    let [info] = await con.query(comando, [
+        servico.nomeServico,
+        servico.valorServico,
+        servico.tempoServico,
+        id
+    ]);
+
+    return info.affectedRows;
+}
+
 export async function atualizarServicoFeito(id, servicoFeito) {
     const comando = `
         UPDATE servicos_feitos
@@ -193,6 +210,23 @@ export async function atualizarServicoFeito(id, servicoFeito) {
 
     let [info] = await con.query(comando, [
         servicoFeito.imagemServicoFeito,
+        servicoFeito.nomeServicoFeito,
+        id
+    ]);
+
+    return info.affectedRows;
+}
+
+
+
+export async function atualizarServicoFeitoNome(id, servicoFeito) {
+    const comando = `
+        UPDATE servicos_feitos
+        SET nome = ?
+        WHERE id_servico_feito = ?
+    `;
+
+    let [info] = await con.query(comando, [
         servicoFeito.nomeServicoFeito,
         id
     ]);
