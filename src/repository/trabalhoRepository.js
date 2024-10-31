@@ -159,3 +159,45 @@ export async function deletarServico(id_servico) {
     return info.affectedRows;
 }
 
+
+
+/*
+Editar
+ */
+
+
+export async function atualizarServico(id, servico) {
+    const comando = `
+        UPDATE servicos
+        SET imagem = ?, nome = ?, valor = ?, tempo = ?
+        WHERE id_servico = ?
+    `;
+
+    let [info] = await con.query(comando, [
+        servico.imagemServico,
+        servico.nomeServico,
+        servico.valorServico,
+        servico.tempoServico,
+        id
+    ]);
+
+    return info.affectedRows;
+}
+
+export async function atualizarServicoFeito(id, servicoFeito) {
+    const comando = `
+        UPDATE servicos_feitos
+        SET imagem = ?, nome = ?
+        WHERE id_servico_feito = ?
+    `;
+
+    let [info] = await con.query(comando, [
+        servicoFeito.imagemServicoFeito,
+        servicoFeito.nomeServicoFeito,
+        id
+    ]);
+
+    return info.affectedRows;
+}
+
+

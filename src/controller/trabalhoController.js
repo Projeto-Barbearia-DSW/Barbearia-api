@@ -8,6 +8,8 @@ import listarServicoFeito from "../service/trabalho/listarServicoFeito.js";
 import excluirAgendamentos from "../service/trabalho/deletarAgendamento.js";
 import excluirServicoFeito from "../service/trabalho/deletarServicoFeito.js";
 import excluirServico from "../service/trabalho/deletarServico.js";
+
+import {atualizarServicoFeito, atualizarServico} from "../repository/trabalhoRepository.js";
 import servicosFeitos from "../service/trabalho/servicosFeitos.js";
 import { Router } from "express";
 import multer from 'multer';
@@ -223,7 +225,6 @@ endpoints.delete('/agendamento/:id', async (req, resp) => {
 
 
 
-
 endpoints.get('/horas', async (req, resp) => {
     try {
         let registros = await listarHoras();
@@ -235,6 +236,57 @@ endpoints.get('/horas', async (req, resp) => {
         });
     }
 });
+
+
+
+
+
+endpoints.put('/servico/:id', uploadServico.single('imagem'), async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let servico = req.body;
+        servico.imagemServico = req.file.path;
+
+        let linhasAfetadas = await atualizarServico(id, servico);
+
+        resp.send({ linhasAfetadas });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+endpoints.put('/servicosfeitos/:id', uploadServicoFeitos.single('imagem'), async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let servicoFeito = req.body;
+        servicoFeito.imagemServicoFeito = req.file.path;
+
+        let linhasAfetadas = await atualizarServicoFeito(id, servicoFeito);
+
+        resp.send({ linhasAfetadas });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+
+
+
+
 
 
 
