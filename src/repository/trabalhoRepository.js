@@ -5,6 +5,11 @@ Inserir
  */
 
 export async function inserirAgendamento(agendar) {
+    const disponivel = await verificarDisponibilidade(agendar.dataAgendamento, agendar.idHorario);
+    if (!disponivel) {
+        throw new Error('Horário já está reservado para esta data.');
+    }
+
     const comando = `
         INSERT INTO agendamento (nome_cliente, telefone_cliente, data_agendamento, id_horario, id_servico)
         VALUES (?, ?, ?, ?, ?)
@@ -60,6 +65,8 @@ export async function inserirServicoFeito(servicoFeito) {
 Listar
  */
 
+
+
 export async function listarAdmin() {
     const comando = `
         select id_admin as id_admin,
@@ -88,6 +95,8 @@ export async function listarAgendamento() {
     let [registros] = await con.query(comando);
     return registros;
 }
+
+
 
 export async function listarServicos() {
     const comando = `
@@ -256,3 +265,93 @@ export async function atualizarAgendamento(id, agendamento) {
 }
 
 
+
+
+export async function inserirAgendamentoFeito(agendamentoFeito) {
+    const comando = `
+        INSERT INTO agendamento_feito (nome_cliente, telefone_cliente, data_agendamento, horario, nome_servico)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    let [info] = await con.query(comando, [
+        agendamentoFeito.nome_cliente,
+        agendamentoFeito.telefone_cliente,
+        agendamentoFeito.data_agendamento,
+        agendamentoFeito.horario,
+        agendamentoFeito.nome_servico
+    ]);
+
+    // Get the service value
+    const [servico] = await con.query(`
+        SELECT valor
+        FROM servicos
+        WHERE nome = ?
+    `, [agendamentoFeito.nome_servico]);
+
+    const valorServico = servico[0].valor;
+
+    const mes = new Date(agendamentoFeito.data_agendamento).getMonth() + 1;
+    const ano = new Date(agendamentoFeito.data_agendamento).getFullYear();
+
+    const [valoresMensais] = await con.query(`
+        SELECT id_valor, valor_total
+        FROM valores_mensais
+        WHERE mes = ? AND ano = ?
+    `, [mes, ano]);
+
+    if (valoresMensais.length > 0) {
+        await con.query(`
+            UPDATE valores_mensais
+            SET valor_total = valor_total + ?
+            WHERE id_valor = ?
+        `, [valorServico, valoresMensais[0].id_valor]);
+    } else {
+        // Insert a new entry
+        await con.query(`
+            INSERT INTO valores_mensais (mes, ano, valor_total)
+            VALUES (?, ?, ?)
+        `, [mes, ano, valorServico]);
+    }
+
+    return info.insertId;
+}
+
+
+export async function listarAgendamentosFeitos() {
+    const comando = `
+        SELECT id_agendamento_feito, nome_cliente, telefone_cliente, data_agendamento, horario, nome_servico
+        FROM agendamento_feito;
+    `;
+
+    let [registros] = await con.query(comando);
+    return registros;
+}
+
+
+export async function deletarAgendamentoFeito(id_agendamento_feito) {
+    const comando = `DELETE FROM agendamento_feito WHERE id_agendamento_feito = ?;`;
+
+    let [info] = await con.query(comando, [id_agendamento_feito]);
+    return info.affectedRows;
+}
+
+export async function verificarDisponibilidade(data, idHorario) {
+    const comando = `
+        SELECT COUNT(*) as count
+        FROM agendamento
+        WHERE data_agendamento = ? AND id_horario = ?
+    `;
+
+    let [result] = await con.query(comando, [data, idHorario]);
+    return result[0].count === 0;
+}
+
+export async function listarValoresMensais() {
+    const comando = `
+        SELECT id_valor, mes, ano, valor_total
+        FROM valores_mensais
+    `;
+
+    let [registros] = await con.query(comando);
+    return registros;
+}

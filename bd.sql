@@ -51,3 +51,19 @@ CREATE TABLE agendamento (
                              CONSTRAINT fk_servico FOREIGN KEY (id_servico) REFERENCES servicos(id_servico)
 );
 
+CREATE TABLE agendamento_feito (
+                                   id_agendamento_feito INT PRIMARY KEY AUTO_INCREMENT,
+                                   nome_cliente VARCHAR(255) NOT NULL,
+                                   telefone_cliente VARCHAR(20) NOT NULL,
+                                   data_agendamento DATE NOT NULL,
+                                   horario TIME NOT NULL,
+                                   nome_servico VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE valores_mensais (
+                                 id_valor INT PRIMARY KEY AUTO_INCREMENT,
+                                 mes INT NOT NULL,
+                                 ano INT NOT NULL,
+                                 valor_total DECIMAL(10, 2) NOT NULL
+);

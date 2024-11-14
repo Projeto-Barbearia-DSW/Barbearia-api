@@ -13,13 +13,19 @@ import {
     atualizarServicoFeito,
     atualizarServico,
     atualizarAgendamento,
-    atualizarServicoFeitoNome, atualizarServicoNome
+    atualizarServicoFeitoNome,
+    atualizarServicoNome,
+    inserirAgendamentoFeito,
+    listarAgendamentosFeitos,
+    deletarAgendamentoFeito,
+    listarValoresMensais
 } from "../repository/trabalhoRepository.js";
 import servicosFeitos from "../service/trabalho/servicosFeitos.js";
 import { Router } from "express";
 import multer from 'multer';
 import path from 'path';
 import {inserirServicoFeito} from "../repository/trabalhoRepository.js";
+
 
 
 
@@ -327,11 +333,51 @@ endpoints.put('/agendamento/:id', async (req, resp) => {
 
 
 
+endpoints.post('/agendamentofeito', async (req, resp) => {
+    try {
+        let agendamentoFeito = req.body;
+        let id = await inserirAgendamentoFeito(agendamentoFeito);
+        resp.send({ novoId: id });
+    } catch (err) {
+        resp.status(400).send({ erro: err.message });
+    }
+});
 
 
 
+endpoints.get('/agendamentofeito', async (req, resp) => {
+    try {
+        let registros = await listarAgendamentosFeitos();
+        resp.send(registros);
+    } catch (err) {
+        resp.status(400).send({ erro: err.message });
+    }
+});
 
 
+endpoints.delete('/agendamentofeito/:id', async (req, resp) => {
+    try {
+        let id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            throw new Error("ID inválido");
+        }
+
+        let linhasAfetadas = await deletarAgendamentoFeito(id);
+        resp.send({ linhasAfetadas });
+    } catch (err) {
+        resp.status(400).send({ erro: err.message });
+    }
+});
+
+
+endpoints.get('/valoresmensais', async (req, resp) => {
+    try {
+        let registros = await listarValoresMensais();
+        resp.send(registros);
+    } catch (err) {
+        resp.status(400).send({ erro: err.message });
+    }
+});
 
 
 
