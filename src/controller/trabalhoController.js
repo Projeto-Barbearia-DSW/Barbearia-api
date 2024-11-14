@@ -231,11 +231,6 @@ endpoints.delete('/agendamento/:id', async (req, resp) => {
     }
 });
 
-
-
-
-
-
 endpoints.get('/horas', async (req, resp) => {
     try {
         let registros = await listarHoras();
@@ -247,10 +242,6 @@ endpoints.get('/horas', async (req, resp) => {
         });
     }
 });
-
-
-
-
 
 endpoints.put('/servico/:id', uploadServico.single('imagem'), async (req, resp) => {
     try {
@@ -309,7 +300,6 @@ endpoints.put('/servicosfeitos/:id', uploadServicoFeitos.single('imagem'), async
     }
 });
 
-
 endpoints.put('/agendamento/:id', async (req, resp) => {
     try {
         let id = parseInt(req.params.id, 10);
@@ -330,9 +320,6 @@ endpoints.put('/agendamento/:id', async (req, resp) => {
     }
 });
 
-
-
-
 endpoints.post('/agendamentofeito', async (req, resp) => {
     try {
         let agendamentoFeito = req.body;
@@ -343,8 +330,6 @@ endpoints.post('/agendamentofeito', async (req, resp) => {
     }
 });
 
-
-
 endpoints.get('/agendamentofeito', async (req, resp) => {
     try {
         let registros = await listarAgendamentosFeitos();
@@ -353,7 +338,6 @@ endpoints.get('/agendamentofeito', async (req, resp) => {
         resp.status(400).send({ erro: err.message });
     }
 });
-
 
 endpoints.delete('/agendamentofeito/:id', async (req, resp) => {
     try {
@@ -369,7 +353,6 @@ endpoints.delete('/agendamentofeito/:id', async (req, resp) => {
     }
 });
 
-
 endpoints.get('/valoresmensais', async (req, resp) => {
     try {
         let registros = await listarValoresMensais();
@@ -378,9 +361,4 @@ endpoints.get('/valoresmensais', async (req, resp) => {
         resp.status(400).send({ erro: err.message });
     }
 });
-
-
-
-
-
 export default endpoints;
