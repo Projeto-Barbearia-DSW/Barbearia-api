@@ -7,7 +7,7 @@ Inserir
 export async function inserirAgendamento(agendar) {
     const disponivel = await verificarDisponibilidade(agendar.dataAgendamento, agendar.idHorario);
     if (!disponivel) {
-        throw new Error('Horário já está reservado para esta data.');
+        throw new Error('Horário já está reservado para esta hora.');
     }
 
     const comando = `
